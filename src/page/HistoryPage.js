@@ -20,6 +20,7 @@ import { FaCommentAlt } from "react-icons/fa";
 import "../css/alarm.css";
 import { Calendar } from "../components/Common";
 import { AlarmCommentDropdown } from "../components/Dropdown";
+import dayjs from "dayjs";
 
 const options = [
   { label: "기본", value: "basic" },
@@ -59,18 +60,22 @@ const data = [
 ];
 
 const HistoryPage = () => {
+  const now = dayjs(); // 현재 날짜 및 시간 가져오기
+  const formatted = now.format("YYYY-MM-DD HH:mm");
+  const [tab, setTab] = useState("all");
   const [value1, setValue1] = useState("basic");
   const [stateFilter, setStateFilter] = useState([]);
   const [alarmHistory, setAlarmHistory] = useState(data);
   const [addComment, setAddComment] = useState(false);
   const [form] = Form.useForm();
+  const onChangeTab = (e) => setTab(e.target.value);
   const onChange1 = ({ target: { value } }) => {
     setValue1(value);
   };
   const onFinish = (values) => {
     setAlarmHistory([
       {
-        time: "2023-08-21 16:50",
+        time: formatted,
         importance: "comment",
         content: values.comments,
         name: "서혜정",
@@ -204,6 +209,90 @@ const HistoryPage = () => {
     };
   });
 
+  const renderContent = (tab) => {
+    switch (tab) {
+      case "all":
+        return (
+          <>
+            <div>
+              <ConfigProvider
+                theme={{
+                  token: {
+                    colorPrimary: "#41b3f9",
+                    colorBgContainer: "rgb(243, 243, 247)",
+                    colorBorder: "rgb(243, 243, 247)",
+                  },
+                }}
+              >
+                <Radio.Group
+                  options={options}
+                  onChange={onChange1}
+                  value={value1}
+                  optionType="button"
+                  buttonStyle="solid"
+                />
+                <Button.Group style={{ marginLeft: "20px" }}>
+                  {options2.map((option) => (
+                    <Button
+                      key={option.value}
+                      className={
+                        stateFilter.includes(option.value)
+                          ? "statefilter-checked"
+                          : ""
+                      }
+                      onClick={() => handleStateFilter(option.value)}
+                    >
+                      <span style={{ marginRight: "5px" }}>
+                        <div
+                          style={{
+                            width: 5,
+                            height: 12,
+                            backgroundColor: option.bg,
+                          }}
+                        />
+                      </span>{" "}
+                      {option.label}
+                    </Button>
+                  ))}
+                </Button.Group>
+              </ConfigProvider>
+              <Button type="default" style={{ float: "right" }}>
+                다운로드
+              </Button>
+            </div>
+            <div>
+              <div id="tab01" style={{ marginTop: "15px" }}>
+                <div
+                  style={{
+                    borderBottom: "2px solid #e8e8e8",
+                    padding: "10px 25px",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    background: "rgb(243, 243, 247)",
+                    marginBottom: "30px",
+                  }}
+                >
+                  2023-08-21
+                </div>
+                <ConfigProvider
+                  theme={{ components: { Timeline: { dotBorderWidth: 0 } } }}
+                >
+                  <Timeline
+                    mode="left"
+                    style={{ padding: "10px 25px" }}
+                    items={items}
+                  />
+                </ConfigProvider>
+              </div>
+              <div id="tab02"></div>
+            </div>
+          </>
+        );
+      case "naverAd":
+        return <div></div>;
+    }
+  };
+
   return (
     <Practice>
       <div
@@ -246,7 +335,38 @@ const HistoryPage = () => {
           }}
         >
           {/* 탭 */}
-          <Tabs
+          <div
+            style={{ marginBottom: "16px", borderBottom: "1px solid #e8e8e8" }}
+          >
+            <ConfigProvider
+              theme={{
+                token: {
+                  colorPrimaryBorder: "black",
+                  colorPrimary: "#41b3f9",
+                  colorBgContainer: "fff",
+                  colorBorder: "black",
+                },
+                components: {
+                  Radio: {
+                    // buttonBg: "#fff",
+                  },
+                },
+              }}
+            >
+              <Radio.Group
+                className="tab"
+                options={[
+                  { label: "전체", value: "all" },
+                  { label: "네이버 광고", value: "naverAd" },
+                ]}
+                value={tab}
+                onChange={onChangeTab}
+                optionType="button"
+                buttonStyle="solid"
+              ></Radio.Group>
+            </ConfigProvider>
+          </div>
+          {/* <Tabs
             type="line"
             items={[
               {
@@ -306,7 +426,8 @@ const HistoryPage = () => {
                 key: "2",
               },
             ]}
-          />
+          /> */}
+
           {/* <ul
             className="nav"
             style={{ borderBottom: "1px solid #ddd", listStyle: "none" }}
@@ -387,7 +508,8 @@ const HistoryPage = () => {
               다운로드
             </Button>
           </div> */}
-          <div>
+          <div>{renderContent(tab)}</div>
+          {/* <div>
             <div id="tab01" style={{ marginTop: "15px" }}>
               <div
                 style={{
@@ -407,221 +529,221 @@ const HistoryPage = () => {
                 <Timeline
                   mode="left"
                   style={{ padding: "10px 25px" }}
-                  // items={[
-                  //   {},
-                  //   {
-                  //     dot: (
-                  //       <FaFaceFrown
-                  //         style={{
-                  //           border: "2px solid black",
-                  //           borderRadius: "50%",
-                  //           backgroundColor: "#000",
-                  //           color: "red",
-                  //           fontSize: "40px",
-                  //           boxShadow: "0 0 5px",
-                  //         }}
-                  //       />
-                  //     ),
-                  //     label: "10:00",
-                  //     children: (
-                  //       <div
-                  //         style={{
-                  //           padding: "10px 25px",
-                  //           fontSize: "15px",
-                  //           background: "#edf1f5",
-                  //           border: "1px solid rgb(221, 221, 221)",
-                  //         }}
-                  //       >
-                  //         매출액이 지난주 월요일(동일 요일 & 동일 시간) 대비
-                  //         860,000원에서 817,000원으로{" "}
-                  //         <span style={{ color: "blue", fontWeight: "bold" }}>
-                  //           5% 감소
-                  //         </span>
-                  //         하였습니다.
-                  //       </div>
-                  //     ),
-                  //   },
-                  //   {
-                  //     dot: (
-                  //       <FaFaceSmile
-                  //         style={{
-                  //           border: "2px solid black",
-                  //           borderRadius: "50%",
-                  //           backgroundColor: "#000",
-                  //           color: "green",
-                  //           fontSize: "40px",
-                  //           boxShadow: "0 0 5px",
-                  //         }}
-                  //       />
-                  //     ),
-                  //     label: "11:10",
-                  //     children: (
-                  //       <div
-                  //         style={{
-                  //           padding: "10px 25px",
-                  //           fontSize: "15px",
-                  //           background: "#edf1f5",
-                  //           border: "1px solid rgb(221, 221, 221)",
-                  //         }}
-                  //       >
-                  //         매출액이 지난주 월요일(동일 요일 & 동일 시간) 대비
-                  //         860,000원에서 817,000원으로{" "}
-                  //         <span style={{ color: "blue", fontWeight: "bold" }}>
-                  //           5% 감소
-                  //         </span>
-                  //         하였습니다.
-                  //       </div>
-                  //     ),
-                  //   },
-                  //   {
-                  //     dot: (
-                  //       <FaFaceMeh
-                  //         style={{
-                  //           border: "2px solid black",
-                  //           borderRadius: "50%",
-                  //           backgroundColor: "#000",
-                  //           color: "#ffdc29",
-                  //           fontSize: "40px",
-                  //           boxShadow: "0 0 5px",
-                  //         }}
-                  //       />
-                  //     ),
-                  //     label: "12:55",
-                  //     children: (
-                  //       <div
-                  //         style={{
-                  //           padding: "10px 25px",
-                  //           fontSize: "15px",
-                  //           background: "#edf1f5",
-                  //           border: "1px solid rgb(221, 221, 221)",
-                  //         }}
-                  //       >
-                  //         매출액이 지난주 월요일(동일 요일 & 동일 시간) 대비
-                  //         860,000원에서 817,000원으로{" "}
-                  //         <span style={{ color: "blue", fontWeight: "bold" }}>
-                  //           5% 감소
-                  //         </span>
-                  //         하였습니다.
-                  //       </div>
-                  //     ),
-                  //   },
-                  //   {
-                  //     dot: (
-                  //       <FaFaceFrown
-                  //         style={{
-                  //           border: "2px solid black",
-                  //           borderRadius: "50%",
-                  //           backgroundColor: "#000",
-                  //           color: "red",
-                  //           fontSize: "40px",
-                  //           boxShadow: "0 0 5px",
-                  //         }}
-                  //       />
-                  //     ),
-                  //     label: "13:00",
-                  //     children: (
-                  //       <div
-                  //         style={{
-                  //           padding: "10px 25px",
-                  //           fontSize: "15px",
-                  //           background: "#edf1f5",
-                  //           border: "1px solid rgb(221, 221, 221)",
-                  //         }}
-                  //       >
-                  //         <a
-                  //           style={{
-                  //             color: "-webkit-link",
-                  //             textDecoration: "underline",
-                  //           }}
-                  //         >
-                  //           https://bizspring.co.kr/company/prd_logger.php
-                  //         </a>{" "}
-                  //         <span style={{ color: "red", fontWeight: "bold" }}>
-                  //           페이지가 404오류
-                  //         </span>
-                  //         로 고객 이탈이 일어나고 있습니다.
-                  //       </div>
-                  //     ),
-                  //   },
-                  //   {
-                  //     dot: (
-                  //       <span
-                  //         style={{
-                  //           height: "40px",
-                  //           boxSizing: "border-box",
-                  //           borderRadius: "50%",
-                  //           width: "40px",
-                  //           background: "#eee",
-                  //           lineHeight: "40px",
-                  //           display: "block",
-                  //         }}
-                  //       >
-                  //         <FaCommentAlt style={{ color: "gray" }} />
-                  //       </span>
-                  //     ),
-                  //     label: "13:50",
-                  //     children: (
-                  //       <>
-                  //         <div
-                  //           style={{
-                  //             padding: "10px 25px",
-                  //             fontSize: "15px",
-                  //             background: "#edf1f5",
-                  //             border: "1px solid rgb(221, 221, 221)",
-                  //           }}
-                  //         >
-                  //           <div
-                  //             style={{
-                  //               display: "flex",
-                  //               justifyContent: "space-between",
-                  //             }}
-                  //           >
-                  //             <span style={{ fontWeight: "bold" }}>서혜정</span>
+                  items={[
+                    {},
+                    {
+                      dot: (
+                        <FaFaceFrown
+                          style={{
+                            border: "2px solid black",
+                            borderRadius: "50%",
+                            backgroundColor: "#000",
+                            color: "red",
+                            fontSize: "40px",
+                            boxShadow: "0 0 5px",
+                          }}
+                        />
+                      ),
+                      label: "10:00",
+                      children: (
+                        <div
+                          style={{
+                            padding: "10px 25px",
+                            fontSize: "15px",
+                            background: "#edf1f5",
+                            border: "1px solid rgb(221, 221, 221)",
+                          }}
+                        >
+                          매출액이 지난주 월요일(동일 요일 & 동일 시간) 대비
+                          860,000원에서 817,000원으로{" "}
+                          <span style={{ color: "blue", fontWeight: "bold" }}>
+                            5% 감소
+                          </span>
+                          하였습니다.
+                        </div>
+                      ),
+                    },
+                    {
+                      dot: (
+                        <FaFaceSmile
+                          style={{
+                            border: "2px solid black",
+                            borderRadius: "50%",
+                            backgroundColor: "#000",
+                            color: "green",
+                            fontSize: "40px",
+                            boxShadow: "0 0 5px",
+                          }}
+                        />
+                      ),
+                      label: "11:10",
+                      children: (
+                        <div
+                          style={{
+                            padding: "10px 25px",
+                            fontSize: "15px",
+                            background: "#edf1f5",
+                            border: "1px solid rgb(221, 221, 221)",
+                          }}
+                        >
+                          매출액이 지난주 월요일(동일 요일 & 동일 시간) 대비
+                          860,000원에서 817,000원으로{" "}
+                          <span style={{ color: "blue", fontWeight: "bold" }}>
+                            5% 감소
+                          </span>
+                          하였습니다.
+                        </div>
+                      ),
+                    },
+                    {
+                      dot: (
+                        <FaFaceMeh
+                          style={{
+                            border: "2px solid black",
+                            borderRadius: "50%",
+                            backgroundColor: "#000",
+                            color: "#ffdc29",
+                            fontSize: "40px",
+                            boxShadow: "0 0 5px",
+                          }}
+                        />
+                      ),
+                      label: "12:55",
+                      children: (
+                        <div
+                          style={{
+                            padding: "10px 25px",
+                            fontSize: "15px",
+                            background: "#edf1f5",
+                            border: "1px solid rgb(221, 221, 221)",
+                          }}
+                        >
+                          매출액이 지난주 월요일(동일 요일 & 동일 시간) 대비
+                          860,000원에서 817,000원으로{" "}
+                          <span style={{ color: "blue", fontWeight: "bold" }}>
+                            5% 감소
+                          </span>
+                          하였습니다.
+                        </div>
+                      ),
+                    },
+                    {
+                      dot: (
+                        <FaFaceFrown
+                          style={{
+                            border: "2px solid black",
+                            borderRadius: "50%",
+                            backgroundColor: "#000",
+                            color: "red",
+                            fontSize: "40px",
+                            boxShadow: "0 0 5px",
+                          }}
+                        />
+                      ),
+                      label: "13:00",
+                      children: (
+                        <div
+                          style={{
+                            padding: "10px 25px",
+                            fontSize: "15px",
+                            background: "#edf1f5",
+                            border: "1px solid rgb(221, 221, 221)",
+                          }}
+                        >
+                          <a
+                            style={{
+                              color: "-webkit-link",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            https://bizspring.co.kr/company/prd_logger.php
+                          </a>{" "}
+                          <span style={{ color: "red", fontWeight: "bold" }}>
+                            페이지가 404오류
+                          </span>
+                          로 고객 이탈이 일어나고 있습니다.
+                        </div>
+                      ),
+                    },
+                    {
+                      dot: (
+                        <span
+                          style={{
+                            height: "40px",
+                            boxSizing: "border-box",
+                            borderRadius: "50%",
+                            width: "40px",
+                            background: "#eee",
+                            lineHeight: "40px",
+                            display: "block",
+                          }}
+                        >
+                          <FaCommentAlt style={{ color: "gray" }} />
+                        </span>
+                      ),
+                      label: "13:50",
+                      children: (
+                        <>
+                          <div
+                            style={{
+                              padding: "10px 25px",
+                              fontSize: "15px",
+                              background: "#edf1f5",
+                              border: "1px solid rgb(221, 221, 221)",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <span style={{ fontWeight: "bold" }}>서혜정</span>
 
-                  //             <AlarmCommentDropdown />
-                  //           </div>
-                  //           404 페이지 조치 완료
-                  //         </div>
-                  //         <div style={{ marginTop: "20px" }}>
-                  //           <div
-                  //             style={{ cursor: "pointer" }}
-                  //             onClick={() => setAddComment((prev) => !prev)}
-                  //           >
-                  //             <FaCommentAlt style={{ color: "#4096ff" }} />{" "}
-                  //             <span
-                  //               style={{ color: "#4096ff", fontWeight: 600 }}
-                  //             >
-                  //               Add a comment
-                  //             </span>
-                  //           </div>
-                  //           {addComment === true && (
-                  //             <div
-                  //               style={{
-                  //                 width: "300px",
-                  //                 marginTop: "10px",
-                  //               }}
-                  //             >
-                  //               <Input placeholder="코멘트를 입력하세요" />
-                  //               <Button
-                  //                 type="primary"
-                  //                 size="small"
-                  //                 style={{ marginTop: "7px", width: "90px" }}
-                  //               >
-                  //                 확인
-                  //               </Button>
-                  //             </div>
-                  //           )}
-                  //         </div>
-                  //       </>
-                  //     ),
-                  //   },
-                  // ]}
+                              <AlarmCommentDropdown />
+                            </div>
+                            404 페이지 조치 완료
+                          </div>
+                          <div style={{ marginTop: "20px" }}>
+                            <div
+                              style={{ cursor: "pointer" }}
+                              onClick={() => setAddComment((prev) => !prev)}
+                            >
+                              <FaCommentAlt style={{ color: "#4096ff" }} />{" "}
+                              <span
+                                style={{ color: "#4096ff", fontWeight: 600 }}
+                              >
+                                Add a comment
+                              </span>
+                            </div>
+                            {addComment === true && (
+                              <div
+                                style={{
+                                  width: "300px",
+                                  marginTop: "10px",
+                                }}
+                              >
+                                <Input placeholder="코멘트를 입력하세요" />
+                                <Button
+                                  type="primary"
+                                  size="small"
+                                  style={{ marginTop: "7px", width: "90px" }}
+                                >
+                                  확인
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ),
+                    },
+                  ]}
                   items={items}
                 />
               </ConfigProvider>
             </div>
             <div id="tab02"></div>
-          </div>
+          </div> */}
         </div>
       </div>
     </Practice>

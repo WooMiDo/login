@@ -158,3 +158,44 @@ fr {
   background: #41b3f9;
   color: #fff;
 }
+@media (min-width: 1512px) {
+  .dynamic-condition-list {
+    width: 15%;
+    float: left;
+  }
+}
+@media (min-width: 1200px) {
+  .budget {
+    width: 33.3%;
+  }
+  .organization {
+    width: 25%;
+    float: left;
+  }
+}
+.budget:not(:last-child) ul {
+  border-right: 1px solid rgba(5, 5, 5, 0.06);
+}
+@media (min-width: 992px) {
+  .panel-body-in {
+    width: 100%;
+    float: left;
+  }
+  .filterItems {
+    float: left;
+  }
+  .useState {
+    width: 16.66666667%;
+    float: left;
+  }
+}
+.tab.ant-radio-group-solid .ant-radio-button-wrapper {
+  border-color: #000;
+  padding-inline: 35px;
+}
+.tab.ant-radio-group-solid .ant-radio-button-wrapper-checked:hover {
+  border-color: #000;
+}
+.tab.ant-radio-group-solid .ant-radio-button-wrapper-checked::before {
+  background-color: #000;
+}
